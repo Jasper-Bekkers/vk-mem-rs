@@ -246,66 +246,6 @@ pub struct AllocatorCreateInfo {
     pub heap_size_limits: Option<Vec<u64>>,
 }
 
-/// Description of an `Allocator` to be created.
-pub struct AllocatorRawCreateInfo {
-    /// Raw VkPhysicalDevice as a VkHandle
-    pub physical_device: u64,
-
-    /// Raw VkDevice as a VkHandle
-    pub device: u64,
-
-    /// When creating a raw device the user is expected to fill out all function pointers themselves,
-    /// these should be queried as usual from the vulkan driver.
-    routed_functions: ffi::VmaVulkanFunctions,
-
-    /// Flags for created allocator.
-    pub flags: AllocatorCreateFlags,
-
-    /// Preferred size of a single `ash::vk::DeviceMemory` block to be allocated from large heaps > 1 GiB.
-    /// Set to 0 to use default, which is currently 256 MiB.
-    pub preferred_large_heap_block_size: usize,
-
-    /// Maximum number of additional frames that are in use at the same time as current frame.
-    ///
-    /// This value is used only when you make allocations with `AllocationCreateFlags::CAN_BECOME_LOST` flag.
-    ///
-    /// Such allocations cannot become lost if:
-    /// `allocation.lastUseFrameIndex >= allocator.currentFrameIndex - frameInUseCount`
-    ///
-    /// For example, if you double-buffer your command buffers, so resources used for
-    /// rendering in previous frame may still be in use by the GPU at the moment you
-    /// allocate resources needed for the current frame, set this value to 1.
-    ///
-    /// If you want to allow any allocations other than used in the current frame to
-    /// become lost, set this value to 0.
-    pub frame_in_use_count: u32,
-
-    /// Either empty or an array of limits on maximum number of bytes that can be allocated
-    /// out of particular Vulkan memory heap.
-    ///
-    /// If not empty, it must contain `ash::vk::PhysicalDeviceMemoryProperties::memory_heap_count` elements,
-    /// defining limit on maximum number of bytes that can be allocated out of particular Vulkan
-    /// memory heap.
-    ///
-    /// Any of the elements may be equal to `ash::vk::WHOLE_SIZE`, which means no limit on that
-    /// heap. This is also the default in case of an empty slice.
-    ///
-    /// If there is a limit defined for a heap:
-    ///
-    /// * If user tries to allocate more memory from that heap using this allocator, the allocation
-    /// fails with `ash::vk::Result::ERROR_OUT_OF_DEVICE_MEMORY`.
-    ///
-    /// * If the limit is smaller than heap size reported in `ash::vk::MemoryHeap::size`, the value of this
-    /// limit will be reported instead when using `Allocator::get_memory_properties`.
-    ///
-    /// Warning! Using this feature may not be equivalent to installing a GPU with smaller amount of
-    /// memory, because graphics driver doesn't necessary fail new allocations with
-    /// `ash::vk::Result::ERROR_OUT_OF_DEVICE_MEMORY` result when memory capacity is exceeded. It may return success
-    /// and just silently migrate some device memory" blocks to system RAM. This driver behavior can
-    /// also be controlled using the `VK_AMD_memory_overallocation_behavior` extension.
-    pub heap_size_limits: Option<Vec<u64>>,
-}
-
 /// Construct `AllocatorCreateInfo` with default values
 impl Default for AllocatorCreateInfo {
     fn default() -> Self {
