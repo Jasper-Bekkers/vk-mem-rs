@@ -29,7 +29,7 @@ travis-ci = { repository = "gwihlidal/vk-mem-rs" }
 maintenance = { status = "actively-developed" }
 
 [dependencies]
-ash = { path = "c:/users/jasper/ash/ash" }
+ash = { git = "https://github.com/Jasper-Bekkers/ash.git" }
 bitflags = "1.0.4"
 failure = "0.1.5"
 

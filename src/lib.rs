@@ -793,14 +793,18 @@ pub struct DefragmentationStats {
 impl Allocator {
     /// Constructor a new `Allocator` using the provided options.
     pub fn new(create_info: &AllocatorCreateInfo) -> Result<Self> {
-        use ash::version::{DeviceV1_0, DeviceV1_1, InstanceV1_0, EntryV1_0};
+        use ash::version::{DeviceV1_0, DeviceV1_1, EntryV1_0, InstanceV1_0};
         let entry = ash::Entry::new().unwrap();
         let instance = unsafe {
-            entry.create_instance_from_raw_handle(create_info.instance_raw).unwrap()
+            entry
+                .create_instance_from_raw_handle(create_info.instance_raw)
+                .unwrap()
         };
 
         let device = unsafe {
-            instance.create_device_from_raw_handle(create_info.device_raw).unwrap()
+            instance
+                .create_device_from_raw_handle(create_info.device_raw)
+                .unwrap()
         };
 
         let routed_functions = unsafe {
@@ -908,10 +912,7 @@ impl Allocator {
             )
         });
         match result {
-            ash::vk::Result::SUCCESS => Ok(Allocator {
-                entry,
-                internal,
-            }),
+            ash::vk::Result::SUCCESS => Ok(Allocator { entry, internal }),
             _ => Err(Error::vulkan(result)),
         }
     }
@@ -1550,8 +1551,7 @@ impl Allocator {
     ///   `VMA_ASSERT` is also fired in that case.
     /// - Other value: Error returned by Vulkan, e.g. memory mapping failure.
     pub fn check_corruption(&self, memory_types: ffi::VkMemoryPropertyFlags) -> Result<()> {
-        let result =
-            ffi_to_result(unsafe { ffi::vmaCheckCorruption(self.internal, memory_types) });
+        let result = ffi_to_result(unsafe { ffi::vmaCheckCorruption(self.internal, memory_types) });
         match result {
             ash::vk::Result::SUCCESS => Ok(()),
             _ => Err(Error::vulkan(result)),
@@ -1764,11 +1764,7 @@ impl Allocator {
         allocation: &Allocation,
     ) -> Result<()> {
         let result = ffi_to_result(unsafe {
-            ffi::vmaBindBufferMemory(
-                self.internal,
-                allocation.internal,
-                buffer,
-            )
+            ffi::vmaBindBufferMemory(self.internal, allocation.internal, buffer)
         });
         match result {
             ash::vk::Result::SUCCESS => Ok(()),
@@ -1795,11 +1791,7 @@ impl Allocator {
         allocation: &Allocation,
     ) -> Result<()> {
         let result = ffi_to_result(unsafe {
-            ffi::vmaBindImageMemory(
-                self.internal,
-                allocation.internal,
-                image,
-            )
+            ffi::vmaBindImageMemory(self.internal, allocation.internal, image)
         });
         match result {
             ash::vk::Result::SUCCESS => Ok(()),
@@ -1840,11 +1832,7 @@ impl Allocator {
             )
         });
         match result {
-            ash::vk::Result::SUCCESS => Ok((
-                buffer,
-                allocation,
-                allocation_info,
-            )),
+            ash::vk::Result::SUCCESS => Ok((buffer, allocation, allocation_info)),
             _ => Err(Error::vulkan(result)),
         }
     }
@@ -1859,17 +1847,9 @@ impl Allocator {
     /// ```
     ///
     /// It it safe to pass null as `buffer` and/or `allocation`.
-    pub fn destroy_buffer(
-        &mut self,
-        buffer: ffi::VkBuffer,
-        allocation: &Allocation,
-    ) -> Result<()> {
+    pub fn destroy_buffer(&mut self, buffer: ffi::VkBuffer, allocation: &Allocation) -> Result<()> {
         unsafe {
-            ffi::vmaDestroyBuffer(
-                self.internal,
-                buffer,
-                allocation.internal,
-            );
+            ffi::vmaDestroyBuffer(self.internal, buffer, allocation.internal);
         }
         Ok(())
     }
@@ -1907,11 +1887,7 @@ impl Allocator {
             )
         });
         match result {
-            ash::vk::Result::SUCCESS => Ok((
-                image,
-                allocation,
-                allocation_info,
-            )),
+            ash::vk::Result::SUCCESS => Ok((image, allocation, allocation_info)),
             _ => Err(Error::vulkan(result)),
         }
     }
@@ -1928,11 +1904,7 @@ impl Allocator {
     /// It it safe to pass null as `image` and/or `allocation`.
     pub fn destroy_image(&mut self, image: ffi::VkImage, allocation: &Allocation) -> Result<()> {
         unsafe {
-            ffi::vmaDestroyImage(
-                self.internal,
-                image,
-                allocation.internal,
-            );
+            ffi::vmaDestroyImage(self.internal, image, allocation.internal);
         }
         Ok(())
     }
